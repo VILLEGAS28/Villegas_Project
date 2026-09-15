@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Movimientos | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .kpis-movimientos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .kpi-card h4 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        .kpi-card p {
+            margin: 5px 0 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .kpi-icono {
+            font-size: 1.8rem;
+            opacity: 0.85;
+        }
+        .barra-herramientas-movimientos {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .input-busqueda {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .input-busqueda:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+        }
+        .select-filtro {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+<div class="dashboard-layout">
+
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="dashboard-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h2>Movimientos de Inventario (Kardex)</h2>
+                <p>Auditoría de ingresos, salidas por órdenes y ajustes de stock.</p>
+            </div>
+            <div class="header-acciones">
+                <button id="contraste-btn" type="button">Contraste</button>
+            </div>
+        </header>
+
+        <!-- TARJETAS DE INDICADORES (KPIS) -->
+        <section class="kpis-movimientos">
+            <div class="kpi-card">
+                <div>
+                    <h4>Total Movimientos</h4>
+                    <p id="kpiTotalMovimientos">0</p>
+                </div>
+                <div class="kpi-icono">🔄</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Entradas (+)</h4>
+                    <p id="kpiEntradas" style="color: #16a34a;">0</p>
+                </div>
+                <div class="kpi-icono">📥</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Salidas (-)</h4>
+                    <p id="kpiSalidas" style="color: #dc2626;">0</p>
+                </div>
+                <div class="kpi-icono">📤</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Ajustes (⚙)</h4>
+                    <p id="kpiAjustes" style="color: #2563eb;">0</p>
+                </div>
+                <div class="kpi-icono">⚖️</div>
+            </div>
+        </section>
+
+        <!-- BARRA DE ACCIONES Y BÚSQUEDA -->
+        <section class="barra-herramientas-movimientos">
+            <input type="text" id="buscadorMovimientos" class="input-busqueda" placeholder="🔍 Buscar por producto, usuario u observación...">
+            
+            <select id="filtroTipoMovimientos" class="select-filtro">
+                <option value="TODOS">Todos los tipos</option>
+                <option value="ENTRADA">Solo Entradas</option>
+                <option value="SALIDA">Solo Salidas</option>
+                <option value="AJUSTE">Solo Ajustes</option>
+            </select>
+
+            <button id="btnActualizarMovimientos" type="button" class="btn-tabla" style="height: 42px; padding: 0 16px;">
+                🔄 Actualizar
+            </button>
+            <button id="btnNuevoMovimiento" type="button" class="btn-principal" style="height: 42px;">
+                ➕ Registrar movimiento
+            </button>
+        </section>
+
+        <!-- FORMULARIO REGISTRAR MOVIMIENTO -->
+        <section id="formularioMovimiento" class="card" style="display:none; margin-bottom: 20px;">
+            <h3>Registrar Movimiento de Inventario</h3>
+
+            <form id="formMovimiento">
+                <div class="form-grid">
+                    <div class="campo">
+                        <label for="productoMovimiento">Producto *</label>
+                        <select id="productoMovimiento" required>
+                            <option value="">Seleccione un producto</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="tipoMovimiento">Tipo de Movimiento *</label>
+                        <select id="tipoMovimiento" required>
+                            <option value="ENTRADA">ENTRADA (Aumenta stock)</option>
+                            <option value="SALIDA">SALIDA (Disminuye stock)</option>
+                            <option value="AJUSTE">AJUSTE (Fija nuevo stock)</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="cantidadMovimiento">Cantidad / Unidades *</label>
+                        <input type="number" id="cantidadMovimiento" min="1" placeholder="Ej: 50" required>
+                    </div>
+                </div>
+
+                <div class="campo" style="margin-top: 10px; margin-bottom: 15px;">
+                    <label for="observacionMovimiento">Observación o justificación del movimiento</label>
+                    <input type="text" id="observacionMovimiento" placeholder="Ej: Ingreso por compra a proveedor o ajuste por conteo físico" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" id="btnGuardarMovimiento" class="btn-principal">Guardar movimiento</button>
+                    <button type="button" id="btnCancelarMovimiento" class="btn-secundario">Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- TABLA DE MOVIMIENTOS -->
+        <section class="card">
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Producto</th>
+                            <th>Usuario Responsable</th>
+                            <th>Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Stock Anterior</th>
+                            <th>Stock Nuevo</th>
+                            <th>Fecha</th>
+                            <th>Observación</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaMovimientos">
+                        <tr>
+                            <td colspan="9">Cargando movimientos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/roles.js"></script>
+</body>
+</html>

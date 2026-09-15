@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Chart.js para los gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-page">
+
+<div class="dashboard-layout">
+
+    <!-- Menú lateral dinámico generado por menu.js -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <!-- Contenido principal -->
+    <main class="dashboard-content">
+
+        <!-- HEADER DEL DASHBOARD -->
+        <header class="dashboard-header">
+            <div>
+                <span class="dashboard-breadcrumb">PANEL PRINCIPAL</span>
+                <h2>Panel de Control</h2>
+                <p>Resumen general y métricas de la operación logística en tiempo real.</p>
+            </div>
+
+            <div class="header-acciones">
+                <div class="usuario-panel">
+                    <div class="usuario-avatar">👤</div>
+                    <div class="usuario-datos">
+                        <strong id="usuarioNombre">Usuario</strong>
+                        <small>Sesión activa</small>
+                    </div>
+                </div>
+
+                <button id="contraste-btn" class="btn-contraste-dash" type="button">
+                    Contraste
+                </button>
+            </div>
+        </header>
+
+        <!-- BANNER DE BIENVENIDA -->
+        <section class="dashboard-welcome">
+            <div class="dashboard-welcome-content">
+                <span>LOGISTIC SOFTWARE</span>
+                <h1>Centro de Control Operativo</h1>
+                <p>
+                    Supervise existencias físicas, órdenes en seguimiento y despachos desde una única plataforma centralizada.
+                </p>
+                <button id="btnActualizarDashboard" class="dashboard-refresh" type="button">
+                    ↻ Actualizar métricas
+                </button>
+            </div>
+
+            <!-- Gráfico ilustrativo SVG -->
+            <div class="dashboard-illustration">
+                <svg viewBox="0 0 400 250" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="35" y="75" width="210" height="130" rx="8" fill="rgba(255,255,255,0.15)"/>
+                    <path d="M20 80L140 18L260 80" fill="rgba(255,255,255,0.24)"/>
+                    <rect x="115" y="128" width="50" height="77" rx="5" fill="rgba(255,255,255,0.30)"/>
+                    <rect x="60" y="110" width="38" height="30" rx="4" fill="rgba(255,255,255,0.25)"/>
+                    <rect x="185" y="110" width="38" height="30" rx="4" fill="rgba(255,255,255,0.25)"/>
+                    <rect x="285" y="75" width="80" height="125" rx="7" fill="rgba(255,255,255,0.15)"/>
+                    <circle cx="255" cy="228" r="11" fill="rgba(255,255,255,0.65)"/>
+                    <circle cx="325" cy="228" r="11" fill="rgba(255,255,255,0.65)"/>
+                </svg>
+            </div>
+        </section>
+
+        <!-- TARJETAS DE INDICADORES PRINCIPALES (KPIS) -->
+        <section class="dashboard-grid">
+            <article class="card-metrica">
+                <div class="metrica-icono">📦</div>
+                <div class="contador" id="inventarioTotal">0</div>
+                <h3>Inventario total</h3>
+                <small>Unidades físicas en bodega</small>
+            </article>
+
+            <article class="card-metrica">
+                <div class="metrica-icono">🛒</div>
+                <div class="contador" id="ordenesEnProceso">0</div>
+                <h3>Órdenes en proceso</h3>
+                <small>Pedidos en preparación o ruta</small>
+            </article>
+
+            <article class="card-metrica">
+                <div class="metrica-icono">🚚</div>
+                <div class="contador" id="entregasHoy">0</div>
+                <h3>Entregas hoy</h3>
+                <small>Despachos programados</small>
+            </article>
+
+            <article class="card-metrica">
+                <div class="metrica-icono">⚠️</div>
+                <div class="contador contador-alerta" id="alertasCriticas">0</div>
+                <h3>Alertas críticas</h3>
+                <small>Productos con bajo stock</small>
+            </article>
+        </section>
+
+        <!-- GRÁFICOS DINÁMICOS -->
+        <section class="dashboard-graficos">
+            <article class="dashboard-chart-card">
+                <div class="dashboard-chart-header">
+                    <div>
+                        <span>INVENTARIO</span>
+                        <h3>Existencias por producto</h3>
+                    </div>
+                    <span class="chart-icon">📦</span>
+                </div>
+                <div class="dashboard-chart-container">
+                    <canvas id="graficoInventario"></canvas>
+                </div>
+            </article>
+
+            <article class="dashboard-chart-card">
+                <div class="dashboard-chart-header">
+                    <div>
+                        <span>ÓRDENES</span>
+                        <h3>Distribución por estado</h3>
+                    </div>
+                    <span class="chart-icon">📊</span>
+                </div>
+                <div class="dashboard-chart-container dashboard-donut">
+                    <canvas id="graficoPedidos"></canvas>
+                </div>
+            </article>
+        </section>
+
+        <!-- PANELES DE CONTROL OPERATIVO EN TIEMPO REAL -->
+        <section class="dashboard-bottom-grid">
+            
+            <!-- PANEL 1: ALERTAS DE REPOSICIÓN URGENTE -->
+            <article class="card" style="margin: 0; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.15rem; color: #0f172a;">🚨 Reposición Urgente</h3>
+                        <small style="color: #64748b;">Productos con existencias en nivel crítico o agotadas</small>
+                    </div>
+                    <a href="inventario.html" class="btn-tabla" style="text-decoration: none; font-size: 0.8rem;">Ver Inventario →</a>
+                </div>
+
+                <div class="tabla-contenedor" style="max-height: 250px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Código</th>
+                                <th>Stock Actual</th>
+                                <th>Mínimo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDashStockCritico">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #64748b; padding: 20px;">
+                                    Consultando alertas de stock...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <!-- PANEL 2: ÚLTIMAS ÓRDENES REGISTRADAS -->
+            <article class="card" style="margin: 0; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.15rem; color: #0f172a;">📦 Últimas Órdenes</h3>
+                        <small style="color: #64748b;">Registro de actividad reciente de clientes</small>
+                    </div>
+                    <a href="pedidos.html" class="btn-tabla" style="text-decoration: none; font-size: 0.8rem;">Ver Órdenes →</a>
+                </div>
+
+                <div class="tabla-contenedor" style="max-height: 250px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Orden</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDashUltimasOrdenes">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #64748b; padding: 20px;">
+                                    Consultando órdenes recientes...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+        </section>
+
+    </main>
+</div>
+
+<!-- Scripts del sistema -->
+<script src="js/script.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/roles.js"></script>
+<script src="js/dashboard.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .kpis-clientes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .kpi-card h4 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        .kpi-card p {
+            margin: 5px 0 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .kpi-icono {
+            font-size: 1.8rem;
+            opacity: 0.85;
+        }
+        .barra-herramientas-clientes {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .input-busqueda {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .input-busqueda:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+        }
+        .select-filtro {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+<div class="dashboard-layout">
+
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="dashboard-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h2>Gestión de Clientes</h2>
+                <p>Directorio maestro de clientes, contactos y destinos de entrega.</p>
+            </div>
+            <div class="header-acciones">
+                <button id="contraste-btn" type="button">Contraste</button>
+            </div>
+        </header>
+
+        <!-- TARJETAS DE INDICADORES (KPIS) -->
+        <section class="kpis-clientes">
+            <div class="kpi-card">
+                <div>
+                    <h4>Total Clientes</h4>
+                    <p id="kpiTotalClientes">0</p>
+                </div>
+                <div class="kpi-icono">👥</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Clientes Activos</h4>
+                    <p id="kpiClientesActivos" style="color: #16a34a;">0</p>
+                </div>
+                <div class="kpi-icono">✓</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Clientes Inactivos</h4>
+                    <p id="kpiClientesInactivos" style="color: #dc2626;">0</p>
+                </div>
+                <div class="kpi-icono">🚫</div>
+            </div>
+        </section>
+
+        <!-- BARRA DE ACCIONES Y BÚSQUEDA -->
+        <section class="barra-herramientas-clientes">
+            <input type="text" id="buscadorClientes" class="input-busqueda" placeholder="🔍 Buscar por nombre, teléfono, correo o ciudad...">
+            
+            <select id="filtroEstadoClientes" class="select-filtro">
+                <option value="TODOS">Todos los estados</option>
+                <option value="ACTIVO">Solo Activos</option>
+                <option value="INACTIVO">Solo Inactivos</option>
+            </select>
+
+            <button id="btnActualizarClientes" type="button" class="btn-tabla" style="height: 42px; padding: 0 16px;">
+                🔄 Actualizar
+            </button>
+            <button id="btnNuevoCliente" type="button" class="btn-principal" style="height: 42px;">
+                ➕ Nuevo cliente
+            </button>
+        </section>
+
+        <!-- FORMULARIO REGISTRAR / EDITAR CLIENTE -->
+        <section id="formularioCliente" class="card" style="display:none; margin-bottom: 20px;">
+            <h3 id="tituloFormCliente">Registrar nuevo cliente</h3>
+
+            <form id="formCliente">
+                <div class="form-grid">
+                    <div class="campo">
+                        <label for="nombreCliente">Nombre o Razón Social *</label>
+                        <input type="text" id="nombreCliente" placeholder="Ej: Hospital San José" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="telefonoCliente">Teléfono de contacto</label>
+                        <input type="text" id="telefonoCliente" placeholder="Ej: 3001234567">
+                    </div>
+
+                    <div class="campo">
+                        <label for="correoCliente">Correo electrónico</label>
+                        <input type="email" id="correoCliente" placeholder="compras@cliente.com">
+                    </div>
+
+                    <div class="campo">
+                        <label for="direccionCliente">Dirección de entrega</label>
+                        <input type="text" id="direccionCliente" placeholder="Ej: Calle 5 # 8-40">
+                    </div>
+
+                    <div class="campo">
+                        <label for="ciudadCliente">Ciudad</label>
+                        <input type="text" id="ciudadCliente" placeholder="Ej: Popayán">
+                    </div>
+
+                    <div class="campo">
+                        <label for="estadoCliente">Estado</label>
+                        <select id="estadoCliente">
+                            <option value="ACTIVO">Activo</option>
+                            <option value="INACTIVO">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="submit" id="btnGuardarCliente" class="btn-principal">Guardar cliente</button>
+                    <button type="button" id="btnCancelarCliente" class="btn-secundario">Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- TABLA DE CLIENTES -->
+        <section class="card">
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Dirección</th>
+                            <th>Ciudad</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaClientes">
+                        <tr>
+                            <td colspan="8">Cargando clientes...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/roles.js"></script>
+</body>
+</html>

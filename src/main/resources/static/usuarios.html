@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .kpis-usuarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .kpi-card h4 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        .kpi-card p {
+            margin: 5px 0 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .kpi-icono {
+            font-size: 1.8rem;
+            opacity: 0.85;
+        }
+        .barra-herramientas-usuarios {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .input-busqueda {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .input-busqueda:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+        }
+        .select-filtro {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+<div class="dashboard-layout">
+
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="dashboard-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h2>Gestión de Usuarios</h2>
+                <p>Administración de credenciales, cuentas y control de accesos.</p>
+            </div>
+            <div class="header-acciones">
+                <button id="contraste-btn" type="button">Contraste</button>
+            </div>
+        </header>
+
+        <!-- TARJETAS DE INDICADORES (KPIS) -->
+        <section class="kpis-usuarios">
+            <div class="kpi-card">
+                <div>
+                    <h4>Total Usuarios</h4>
+                    <p id="kpiTotalUsuarios">0</p>
+                </div>
+                <div class="kpi-icono">👥</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Usuarios Activos</h4>
+                    <p id="kpiUsuariosActivos" style="color: #16a34a;">0</p>
+                </div>
+                <div class="kpi-icono">✓</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Usuarios Inactivos</h4>
+                    <p id="kpiUsuariosInactivos" style="color: #dc2626;">0</p>
+                </div>
+                <div class="kpi-icono">🚫</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Administradores</h4>
+                    <p id="kpiAdministradores" style="color: #2563eb;">0</p>
+                </div>
+                <div class="kpi-icono">👑</div>
+            </div>
+        </section>
+
+        <!-- BARRA DE ACCIONES Y BÚSQUEDA -->
+        <section class="barra-herramientas-usuarios">
+            <input type="text" id="buscadorUsuarios" class="input-busqueda" placeholder="🔍 Buscar por nombre, apellido o correo...">
+            
+            <select id="filtroRolUsuarios" class="select-filtro">
+                <option value="TODOS">Todos los roles</option>
+            </select>
+
+            <select id="filtroEstadoUsuarios" class="select-filtro">
+                <option value="TODOS">Todos los estados</option>
+                <option value="ACTIVO">Solo Activos</option>
+                <option value="INACTIVO">Solo Inactivos</option>
+            </select>
+
+            <button id="btnActualizarUsuarios" type="button" class="btn-tabla" style="height: 42px; padding: 0 16px;">
+                🔄 Actualizar
+            </button>
+            <button id="btnNuevoUsuario" type="button" class="btn-principal" style="height: 42px;">
+                ➕ Nuevo usuario
+            </button>
+        </section>
+
+        <!-- FORMULARIO REGISTRAR / EDITAR USUARIO -->
+        <section id="formularioUsuario" class="card" style="display: none; margin-bottom: 20px;">
+            <h3 id="tituloFormUsuario">Registrar nuevo usuario</h3>
+
+            <form id="formUsuario">
+                <div class="form-grid">
+                    <div class="campo">
+                        <label for="nombreUsuario">Nombre *</label>
+                        <input type="text" id="nombreUsuario" placeholder="Ingrese el nombre" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="apellidoUsuario">Apellido *</label>
+                        <input type="text" id="apellidoUsuario" placeholder="Ingrese el apellido" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="correoUsuario">Correo electrónico *</label>
+                        <input type="email" id="correoUsuario" placeholder="nombre@softwarelogistic.com" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="passwordUsuario">Contraseña</label>
+                        <input type="password" id="passwordUsuario" placeholder="Ingrese contraseña">
+                        <small id="passAyuda" style="color: #64748b; display: none;">Dejar en blanco si no desea cambiarla al editar.</small>
+                    </div>
+
+                    <div class="campo">
+                        <label for="rolUsuario">Rol en el sistema *</label>
+                        <select id="rolUsuario" required>
+                            <option value="">Seleccione un rol</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="estadoUsuario">Estado *</label>
+                        <select id="estadoUsuario">
+                            <option value="ACTIVO">Activo</option>
+                            <option value="INACTIVO">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="submit" id="btnGuardarUsuario" class="btn-principal">Guardar usuario</button>
+                    <button type="button" id="btnCancelarUsuario" class="btn-secundario">Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- TABLA DE USUARIOS REGISTRADOS -->
+        <section class="card">
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUsuarios">
+                        <tr>
+                            <td colspan="7">Cargando usuarios...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/roles.js"></script>
+</body>
+</html>

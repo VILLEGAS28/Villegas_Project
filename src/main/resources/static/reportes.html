@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="dashboard-page">
+
+<div class="dashboard-layout">
+
+    <!-- MENÚ LATERAL -->
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="dashboard-content">
+
+        <!-- ENCABEZADO -->
+        <header class="dashboard-header">
+            <div>
+                <h2>Reportes del sistema</h2>
+                <p>Información general y estadísticas de Logistic Software.</p>
+            </div>
+            <div class="header-acciones">
+                <button id="contraste-btn" type="button">Contraste</button>
+            </div>
+        </header>
+
+        <!-- BOTONES -->
+        <section class="acciones-inventario">
+            <button id="btnActualizarReportes" type="button">🔄 Actualizar reportes</button>
+        </section>
+
+        <!-- TARJETAS RESUMEN -->
+        <section class="dashboard-cards">
+            <div class="dashboard-card">
+                <div class="dashboard-card-top">
+                    <div>
+                        <small>Total</small>
+                        <p id="reporteInventario">Cargando...</p>
+                    </div>
+                    <div class="dashboard-card-icon">📦</div>
+                </div>
+                <h3 style="margin-top: 10px; font-size: 0.95rem; color: #475569;">Inventario total</h3>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-top">
+                    <div>
+                        <small>Total</small>
+                        <p id="reporteProductos">Cargando...</p>
+                    </div>
+                    <div class="dashboard-card-icon">🧾</div>
+                </div>
+                <h3 style="margin-top: 10px; font-size: 0.95rem; color: #475569;">Productos</h3>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-top">
+                    <div>
+                        <small>Total</small>
+                        <p id="reporteClientes">Cargando...</p>
+                    </div>
+                    <div class="dashboard-card-icon">👥</div>
+                </div>
+                <h3 style="margin-top: 10px; font-size: 0.95rem; color: #475569;">Clientes</h3>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-top">
+                    <div>
+                        <small>Total</small>
+                        <p id="reportePedidos">Cargando...</p>
+                    </div>
+                    <div class="dashboard-card-icon">🛒</div>
+                </div>
+                <h3 style="margin-top: 10px; font-size: 0.95rem; color: #475569;">Órdenes</h3>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-top">
+                    <div>
+                        <small>Total</small>
+                        <p id="reporteEntregas">Cargando...</p>
+                    </div>
+                    <div class="dashboard-card-icon">🚚</div>
+                </div>
+                <h3 style="margin-top: 10px; font-size: 0.95rem; color: #475569;">Entregas</h3>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-top">
+                    <div>
+                        <small>Total</small>
+                        <p id="reporteUsuarios">Cargando...</p>
+                    </div>
+                    <div class="dashboard-card-icon">👤</div>
+                </div>
+                <h3 style="margin-top: 10px; font-size: 0.95rem; color: #475569;">Usuarios</h3>
+            </div>
+        </section>
+
+        <!-- ESTADO DE ÓRDENES -->
+        <section class="card">
+            <h3>Estado de las órdenes</h3>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estado</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaEstadosPedidos">
+                        <tr>
+                            <td colspan="2">Cargando información...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ALERTAS DE INVENTARIO -->
+        <section class="card">
+            <h3>Alertas de inventario</h3>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad actual</th>
+                            <th>Stock mínimo</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAlertasInventario">
+                        <tr>
+                            <td colspan="4">Cargando información...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/menu.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    cargarReportes();
+});
+
+const btnActualizarReportes = document.getElementById("btnActualizarReportes");
+if (btnActualizarReportes) {
+    btnActualizarReportes.addEventListener("click", cargarReportes);
+}
+
+async function cargarReportes() {
+    try {
+        const respuestas = await Promise.all([
+            fetch("/api/dashboard"),
+            fetch("/api/productos"),
+            fetch("/api/clientes"),
+            fetch("/api/pedidos"),
+            fetch("/api/entregas"),
+            fetch("/api/usuarios"),
+            fetch("/api/inventario")
+        ]);
+
+        for (const respuesta of respuestas) {
+            if (!respuesta.ok) {
+                throw new Error("No fue posible consultar uno de los módulos.");
+            }
+        }
+
+        const [
+            dashboard,
+            productos,
+            clientes,
+            pedidos,
+            entregas,
+            usuarios,
+            inventarios
+        ] = await Promise.all(
+            respuestas.map(respuesta => respuesta.json())
+        );
+
+        document.getElementById("reporteInventario").textContent = dashboard.inventarioTotal ?? 0;
+        document.getElementById("reporteProductos").textContent = Array.isArray(productos) ? productos.length : 0;
+        document.getElementById("reporteClientes").textContent = Array.isArray(clientes) ? clientes.length : 0;
+        document.getElementById("reportePedidos").textContent = Array.isArray(pedidos) ? pedidos.length : 0;
+        document.getElementById("reporteEntregas").textContent = Array.isArray(entregas) ? entregas.length : 0;
+        document.getElementById("reporteUsuarios").textContent = Array.isArray(usuarios) ? usuarios.length : 0;
+
+        cargarEstadosPedidos(pedidos);
+        cargarAlertasInventario(inventarios, productos);
+
+    } catch (error) {
+        console.error("Error cargando reportes:", error);
+        document.getElementById("reporteInventario").textContent = "Error";
+        document.getElementById("reporteProductos").textContent = "Error";
+        document.getElementById("reporteClientes").textContent = "Error";
+        document.getElementById("reportePedidos").textContent = "Error";
+        document.getElementById("reporteEntregas").textContent = "Error";
+        document.getElementById("reporteUsuarios").textContent = "Error";
+
+        document.getElementById("tablaEstadosPedidos").innerHTML = `
+            <tr>
+                <td colspan="2">No fue posible cargar los reportes.</td>
+            </tr>
+        `;
+    }
+}
+
+function cargarEstadosPedidos(pedidos) {
+    const tabla = document.getElementById("tablaEstadosPedidos");
+    if (!Array.isArray(pedidos) || pedidos.length === 0) {
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="2">No existen órdenes registradas.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    const estados = {};
+    pedidos.forEach(pedido => {
+        const estado = pedido.estado || "SIN ESTADO";
+        if (!estados[estado]) {
+            estados[estado] = 0;
+        }
+        estados[estado]++;
+    });
+
+    tabla.innerHTML = "";
+    Object.keys(estados).forEach(estado => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${estado}</td>
+            <td><strong>${estados[estado]}</strong></td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+
+function cargarAlertasInventario(inventarios, productos) {
+    const tabla = document.getElementById("tablaAlertasInventario");
+    if (!Array.isArray(inventarios)) {
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="4">No fue posible consultar el inventario.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    const mapaProductos = {};
+    if (Array.isArray(productos)) {
+        productos.forEach(producto => {
+            // CORRECCIÓN CLAVE: idProducto
+            mapaProductos[producto.idProducto] = producto;
+        });
+    }
+
+    const alertas = inventarios.filter(inventario => {
+        const producto = mapaProductos[inventario.idProducto];
+        if (!producto) return false;
+        const cantidad = Number(inventario.cantidad ?? 0);
+        const minimo = Number(producto.stockMinimo ?? 0);
+        return cantidad <= minimo;
+    });
+
+    if (alertas.length === 0) {
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center; color: #16a34a; font-weight: bold;">
+                    ✓ No existen alertas críticas de inventario. Todo el stock está en niveles óptimos.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tabla.innerHTML = "";
+    alertas.forEach(inventario => {
+        const producto = mapaProductos[inventario.idProducto];
+        const cantidad = Number(inventario.cantidad ?? 0);
+        const minimo = Number(producto.stockMinimo ?? 0);
+
+        let textoEstado = cantidad === 0 ? "Agotado" : "Stock bajo";
+        let claseEstado = cantidad === 0 ? "estado-agotado" : "estado-bajo";
+
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td><strong>${producto.nombre || "Sin nombre"}</strong> (${producto.codigo || 'N/A'})</td>
+            <td><strong>${cantidad}</strong></td>
+            <td>${minimo}</td>
+            <td><span class="estado-stock ${claseEstado}">${textoEstado}</span></td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+</script>
+
+</body>
+</html>

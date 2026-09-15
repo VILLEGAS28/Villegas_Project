@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Acceso a la plataforma Logistic Software">
+    <title>Iniciar Sesión | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="login-page">
+
+    <!-- Botón de accesibilidad con el ID que espera tu script.js -->
+    <button type="button" class="btn-accesibilidad" id="contraste-btn" aria-label="Modo alto contraste">
+        👁️ Alto Contraste
+    </button>
+
+    <main class="login-wrapper">
+        <div class="login-card">
+            
+            <!-- Logotipo y Nombre -->
+            <div class="login-brand">
+                <div class="login-logo-badge">LS</div>
+                <div class="login-brand-info">
+                    <strong>LOGISTIC SOFTWARE</strong>
+                    <span>Gestión logística empresarial</span>
+                </div>
+            </div>
+
+            <!-- Título -->
+            <header class="login-header">
+                <h1>Bienvenido</h1>
+                <p>Ingrese sus credenciales corporativas para acceder al sistema.</p>
+            </header>
+
+            <!-- Formulario con los IDs EXACTOS de tu script.js -->
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="usuario">Correo electrónico</label>
+                    <div class="input-container">
+                        <span class="input-icon">✉</span>
+                        <input 
+                            type="email" 
+                            id="usuario" 
+                            name="usuario" 
+                            placeholder="irianalopez@softwarelogistic.com" 
+                            required 
+                            autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-container">
+                        <span class="input-icon">🔒</span>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••" 
+                            required 
+                            autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login-submit">
+                    Ingresar al sistema
+                    <span class="btn-arrow">→</span>
+                </button>
+            </form>
+
+            <footer class="login-footer">
+                <a href="index.html" class="link-volver">
+                    ← Volver a la página principal
+                </a>
+            </footer>
+
+        </div>
+    </main>
+
+    <!-- Vinculación del script principal -->
+    <script src="js/script.js"></script>
+</body>
+</html>

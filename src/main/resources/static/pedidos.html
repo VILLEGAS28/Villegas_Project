@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Órdenes | Logistic Software</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .kpis-pedidos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .kpi-card {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .kpi-card h4 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+        .kpi-card p {
+            margin: 5px 0 0 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0f172a;
+        }
+        .kpi-icono {
+            font-size: 1.8rem;
+            opacity: 0.85;
+        }
+        .barra-herramientas-pedidos {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .input-busqueda {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .input-busqueda:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+        }
+        .select-filtro {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        /* Tabla de productos en la orden */
+        .tabla-items-pedido {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .tabla-items-pedido th, .tabla-items-pedido td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .tabla-items-pedido th {
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        .panel-agregar-producto {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+            margin-top: 15px;
+        }
+        .resumen-total-pedido {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            font-size: 1.1rem;
+        }
+        .total-destacado {
+            font-weight: bold;
+            color: #0f172a;
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+<div class="dashboard-layout">
+
+    <aside id="sidebar" class="sidebar"></aside>
+
+    <main class="dashboard-content">
+
+        <header class="dashboard-header">
+            <div>
+                <h2>Gestión de Órdenes y Pedidos</h2>
+                <p>Seguimiento integral, facturación y estados de despacho.</p>
+            </div>
+            <div class="header-acciones">
+                <button id="contraste-btn" type="button">Contraste</button>
+            </div>
+        </header>
+
+        <!-- TARJETAS DE INDICADORES (KPIS) -->
+        <section class="kpis-pedidos">
+            <div class="kpi-card">
+                <div>
+                    <h4>Total Órdenes</h4>
+                    <p id="kpiTotalPedidos">0</p>
+                </div>
+                <div class="kpi-icono">🛒</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>En Proceso</h4>
+                    <p id="kpiPedidosEnProceso" style="color: #ea580c;">0</p>
+                </div>
+                <div class="kpi-icono">⏳</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Entregadas</h4>
+                    <p id="kpiPedidosEntregados" style="color: #16a34a;">0</p>
+                </div>
+                <div class="kpi-icono">✓</div>
+            </div>
+            <div class="kpi-card">
+                <div>
+                    <h4>Canceladas</h4>
+                    <p id="kpiPedidosCancelados" style="color: #dc2626;">0</p>
+                </div>
+                <div class="kpi-icono">✕</div>
+            </div>
+        </section>
+
+        <!-- BARRA DE ACCIONES Y BÚSQUEDA -->
+        <section class="barra-herramientas-pedidos">
+            <input type="text" id="buscadorPedidos" class="input-busqueda" placeholder="🔍 Buscar por ID de orden o nombre de cliente...">
+            
+            <select id="filtroEstadoPedidos" class="select-filtro">
+                <option value="TODOS">Todos los estados</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="PROCESANDO">Procesando</option>
+                <option value="PREPARADO">Preparado</option>
+                <option value="ENVIADO">Enviado</option>
+                <option value="ENTREGADO">Entregado</option>
+                <option value="CANCELADO">Cancelado</option>
+            </select>
+
+            <button id="btnActualizarPedidos" type="button" class="btn-tabla" style="height: 42px; padding: 0 16px;">
+                🔄 Actualizar
+            </button>
+            <button id="btnNuevoPedido" type="button" class="btn-principal" style="height: 42px;">
+                ➕ Nueva orden
+            </button>
+        </section>
+
+        <!-- FORMULARIO TOMA DE PEDIDOS MULTI-PRODUCTO -->
+        <section id="formularioPedido" class="card" style="display:none; margin-bottom: 20px;">
+            <h3 id="tituloFormPedido">Registrar nueva orden de pedido</h3>
+
+            <form id="formPedido">
+                <div class="form-grid">
+                    <div class="campo">
+                        <label for="clientePedido">Cliente *</label>
+                        <select id="clientePedido" required>
+                            <option value="">Seleccione un cliente</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="estadoPedido">Estado de la orden</label>
+                        <select id="estadoPedido">
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="PROCESANDO">Procesando</option>
+                            <option value="PREPARADO">Preparado</option>
+                            <option value="ENVIADO">Enviado</option>
+                            <option value="ENTREGADO">Entregado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- SELECTOR DE PRODUCTOS PARA AGREGAR -->
+                <div class="panel-agregar-producto">
+                    <div class="campo" style="flex: 2;">
+                        <label for="productoPedido">Seleccionar Producto</label>
+                        <select id="productoPedido">
+                            <option value="">Cargando productos...</option>
+                        </select>
+                    </div>
+
+                    <div class="campo" style="flex: 1;">
+                        <label for="cantidadPedido">Cantidad</label>
+                        <input type="number" id="cantidadPedido" min="1" value="1">
+                    </div>
+
+                    <button type="button" id="btnAgregarItemPedido" class="btn-principal" style="height: 42px; white-space: nowrap;">
+                        ➕ Agregar a la orden
+                    </button>
+                </div>
+
+                <!-- TABLA INTERACTIVA DE PRODUCTOS EN LA ORDEN -->
+                <table class="tabla-items-pedido">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Código</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaItemsPedidoBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #64748b; padding: 20px;">
+                                No has agregado productos a esta orden aún.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- TOTAL DE LA ORDEN -->
+                <div class="resumen-total-pedido">
+                    <span>Total a facturar:</span>
+                    <span class="total-destacado" id="totalPedidoTexto">$ 0</span>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" id="btnGuardarPedido" class="btn-principal">
+                        ✓ Confirmar y Guardar Pedido
+                    </button>
+                    <button type="button" id="btnCancelarPedido" class="btn-secundario">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- TABLA HISTORIAL DE PEDIDOS -->
+        <section class="card">
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaPedidos">
+                        <tr>
+                            <td colspan="5">Cargando pedidos...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/roles.js"></script>
+</body>
+</html>
